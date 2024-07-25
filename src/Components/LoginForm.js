@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './LoginForm.css';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginMessage, setLoginMessage] = useState('');
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const loginData = { email, password };
 
-    if (storedUser && email === storedUser.email && password === storedUser.password) {
+    try {
+      const response = await axios.post('http://localhost:8080/users', loginData);
+      localStorage.setItem('token', response.data.token);
       setLoginMessage('Login successful');
       navigate('/dashboard');
-    } else {
+    } catch (error) {
       setLoginMessage('Invalid email or password');
     }
   };

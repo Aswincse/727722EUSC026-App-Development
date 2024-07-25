@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import './RegisterForm.css';
 
 const RegisterForm = () => {
@@ -11,26 +12,39 @@ const RegisterForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [registrationMessage, setRegistrationMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (password !== confirmPassword) {
       setRegistrationMessage('Passwords do not match');
       return;
     }
 
-    // Store user data in local storage
     const userData = { firstName, lastName, mobile, email, password };
-    localStorage.setItem('user', JSON.stringify(userData));
-    setRegistrationMessage('Registration successful');
 
-    // Clear form fields
-    setFirstName('');
-    setLastName('');
-    setMobile('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
+    try {
+      const response = await axios.post('http://localhost:8080/users', userData);
+      setRegistrationMessage(response.data.message);
+      // Clear form fields (optional)
+      setFirstName('');
+      setLastName('');
+      setMobile('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      if (error.response) {
+        const { message } = error.response.data;
+        if (message.includes('duplicate phone')) {
+          setRegistrationMessage('Phone number already exists.');
+        } else if (message.includes('duplicate email')) {
+          setRegistrationMessage('Email address already in use.');
+        } else {
+          setRegistrationMessage('Registration failed. Please try again.');
+        }
+      } else {
+        setRegistrationMessage('Network error. Please try again.');
+      }
+    }
   };
 
   return (
@@ -40,7 +54,7 @@ const RegisterForm = () => {
         <input
           className="register-input"
           type="text"
-          placeholder="First Name"
+          placeholder="First Name*"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           required
@@ -48,7 +62,7 @@ const RegisterForm = () => {
         <input
           className="register-input"
           type="text"
-          placeholder="Last Name"
+          placeholder="Last Name*"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
           required
@@ -56,7 +70,7 @@ const RegisterForm = () => {
         <input
           className="register-input"
           type="text"
-          placeholder="Mobile No"
+          placeholder="Mobile No*"
           value={mobile}
           onChange={(e) => setMobile(e.target.value)}
           required
@@ -64,7 +78,7 @@ const RegisterForm = () => {
         <input
           className="register-input"
           type="email"
-          placeholder="Email"
+          placeholder="Email*"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
@@ -72,7 +86,7 @@ const RegisterForm = () => {
         <input
           className="register-input"
           type="password"
-          placeholder="Password"
+          placeholder="Password*"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
@@ -80,16 +94,20 @@ const RegisterForm = () => {
         <input
           className="register-input"
           type="password"
-          placeholder="Confirm Password"
+          placeholder="Confirm Password*"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
-        <button className="register-button" type="submit">Register</button>
+        <button className="register-button" type="submit">
+          Register
+        </button>
         <div className="register-signin-link">
           Already have an account? <Link to="/login">Login</Link>
         </div>
-        {registrationMessage && <p className="register-message">{registrationMessage}</p>}
+        {registrationMessage && (
+          <p className="register-message-error">{registrationMessage}</p>
+        )}
       </form>
     </div>
   );
