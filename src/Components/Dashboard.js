@@ -1,4 +1,3 @@
-// Dashboard.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CSSTransition } from 'react-transition-group';
@@ -12,7 +11,6 @@ import SIS from './SIS';
 import CommunicationTools from './CommunicationTools';
 import Assessment from './Assessment';
 import ResourceLibrary from './ResourceLibrary';
-import CollaborationTools from './CollaborationTools';
 import Settings from './Settings';
 import Storybook from './Storybook';
 import SidePanel from './SidePanel';
@@ -49,8 +47,6 @@ const Dashboard = () => {
         return <Assessment />;
       case 'resource-library':
         return <ResourceLibrary />;
-      case 'collaboration-tools':
-        return <CollaborationTools />;
       case 'settings':
         return <Settings />;
       case 'storybook':
@@ -60,8 +56,10 @@ const Dashboard = () => {
     }
   };
 
+  const shouldDisplayHeading = activeView !== 'home';
+
   return (
-    <div className="dashboard-container">
+    <div className={`dashboard-container ${collapsed ? 'collapsed' : ''}`}>
       <Navbar handleLogout={handleLogout} />
       <div className="dashboard-content">
         <SidePanel 
@@ -71,7 +69,9 @@ const Dashboard = () => {
           collapsed={collapsed}
         />
         <main className="main-section">
-          <h1 className="main-title">{activeView.charAt(0).toUpperCase() + activeView.slice(1).replace('-', ' ')}</h1>
+          {shouldDisplayHeading && (
+            <h1 className="main-title">{activeView.charAt(0).toUpperCase() + activeView.slice(1).replace('-', ' ')}</h1>
+          )}
           <CSSTransition
             in={true}
             timeout={300}
