@@ -5,13 +5,13 @@ import LoginForm from './Components/LoginForm';
 import Dashboard from './Components/Dashboard'; 
 import AdminPage from './Components/AdminPage';
 import AdminDashboard from './Components/AdminDashboard';
-import { UserProvider1 } from './Components/UserContext1'; // Updated import
+import { UserProvider } from './Components/UserContext';
 import ProtectedRoute from './Components/ProtectedRoute';
 import AdminProtectedRoute from './Components/AdminProtectedRoute';
 
 const App = () => {
   return (
-    <UserProvider1>
+    <UserProvider>
       <Router>
         <Routes>
           <Route path="/" element={<LoginForm />} /> 
@@ -30,7 +30,7 @@ const App = () => {
           } />
         </Routes>
       </Router>
-    </UserProvider1>
+    </UserProvider>
   );
 };
 

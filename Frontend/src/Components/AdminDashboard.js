@@ -5,6 +5,7 @@ import { FaSignOutAlt } from 'react-icons/fa';
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [payments, setPayments] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
   const [newUser, setNewUser] = useState({
     name: '',
@@ -31,6 +32,7 @@ const AdminDashboard = () => {
     fetchUsers();
     fetchAdmins();
     fetchOrders();
+    fetchPayments();
   }, []);
 
   const fetchUsers = async () => {
@@ -86,6 +88,26 @@ const AdminDashboard = () => {
       console.error('Error fetching orders:', error);
     }
   };
+
+  const fetchPayments = async () => {
+    const token = localStorage.getItem('authToken');
+    try {
+      const response = await fetch('http://localhost:8080/admin/get', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) throw new Error('Network response was not ok.');
+      const data = await response.json();
+      console.log(data); // Log the data to see what is returned
+      setPayments(data);
+    } catch (error) {
+      console.error('Error fetching payments:', error);
+    }
+  };
+  
 
   const showPopupMessage = (message) => {
     setPopupMessage(message);
@@ -282,6 +304,15 @@ const AdminDashboard = () => {
                 Manage Orders
               </a>
             </li>
+            <li>
+              <a
+                href="#"
+                className={activeLink === '/admin-manage-payments' ? 'active' : ''}
+                onClick={() => handleLinkClick('/admin-manage-payments')}
+              >
+                Manage Payments
+              </a>
+            </li>
           </ul>
         </aside>
         <div className="main-content23">
@@ -291,8 +322,10 @@ const AdminDashboard = () => {
               <table>
                 <thead>
                   <tr>
+                    <th>ID</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Role</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -301,6 +334,7 @@ const AdminDashboard = () => {
                     <tr key={user.id}>
                       {editingUser?.id === user.id ? (
                         <>
+                        <td>{user.id}</td>
                           <td>
                             <input
                               type="text"
@@ -317,6 +351,7 @@ const AdminDashboard = () => {
                               onChange={handleInputChange}
                             />
                           </td>
+                          <td>{user.roles}</td>
                           <td>
                             <button onClick={() => handleSave(user.id)}>Save</button>
                             <button onClick={() => setEditingUser(null)}>Cancel</button>
@@ -324,8 +359,10 @@ const AdminDashboard = () => {
                         </>
                       ) : (
                         <>
+                          <td>{user.id}</td>
                           <td>{user.name}</td>
                           <td>{user.email}</td>
+                          <td>{user.roles}</td>
                           <td>
                             <button onClick={() => setEditingUser(user)}>Edit</button>
                             <button onClick={() => handleDelete(user.id)}>Delete</button>
@@ -339,84 +376,137 @@ const AdminDashboard = () => {
             </div>
           )}
           {activeLink === '/admin-add-user' && (
-            <div className="add-user-form23">
-              <h2>Add New User</h2>
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={newUser.name}
-                onChange={handleNewUserChange}
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={newUser.email}
-                onChange={handleNewUserChange}
-              />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={newUser.password}
-                onChange={handleNewUserChange}
-              />
-              <button onClick={handleAddUser}>Add User</button>
+            <div className="add-user23">
+              <h3>Add New User</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddUser();
+                }}
+              >
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={newUser.name}
+                  onChange={handleNewUserChange}
+                  required
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={newUser.email}
+                  onChange={handleNewUserChange}
+                  required
+                />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={newUser.password}
+                  onChange={handleNewUserChange}
+                  required
+                />
+                <button type="submit">Add User</button>
+              </form>
             </div>
           )}
           {activeLink === '/admin-add-admin' && (
-            <div className="add-admin-form23">
-              <h2>Add New Admin</h2>
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={newAdmin.name}
-                onChange={handleNewAdminChange}
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email"
-                value={newAdmin.email}
-                onChange={handleNewAdminChange}
-              />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={newAdmin.password}
-                onChange={handleNewAdminChange}
-              />
-              <button onClick={handleAddAdmin}>Add Admin</button>
+            <div className="add-user23">
+              <h3>Add New Admin</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleAddAdmin();
+                }}
+              >
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name"
+                  value={newAdmin.name}
+                  onChange={handleNewAdminChange}
+                  required
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  value={newAdmin.email}
+                  onChange={handleNewAdminChange}
+                  required
+                />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={newAdmin.password}
+                  onChange={handleNewAdminChange}
+                  required
+                />
+                <button type="submit">Add Admin</button>
+              </form>
             </div>
           )}
           {activeLink === '/admin-manage-orders' && (
-            <div className="order-list23">
-              <h2>Manage Orders</h2>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Order ID</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map((order) => (
-                    <tr key={order.id}>
-                      <td>{order.id}</td>
-                      <td>{order.status}</td>
-                      <td>
-                        {order.status === 'Pending' && (
-                          <button onClick={() => handleApproveOrder(order.id)}>Approve</button>
-                        )}
-                      </td>
+            <div className="manage-orders23">
+              <h3>Orders</h3>
+              {loading ? <p>Loading...</p> : (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Course Name</th>
+                      <th>Status</th>
+                      <th>Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {orders.map(order => (
+                      <tr key={order.id}>
+                        <td>{order.id}</td>
+                        <td>{order.coursename}</td>
+                        <td>{order.status}</td>
+                        <td>
+                          {order.status !== 'Approved' && (
+                            <button onClick={() => handleApproveOrder(order.id)}>Approve</button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
+          {activeLink === '/admin-manage-payments' && (
+            <div className="manage-orders23">
+              <h3>Payments</h3>
+              {loading ? <p>Loading...</p> : (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>NAME</th>
+                      <th>CARD NUMBER</th>
+                      <th>CVV</th>
+                      <th>EXPIRY DATE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {payments.map(payment => (
+                      <tr key={payment.id}>
+                        <td>{payment.id}</td>
+                        <td>{payment.name}</td>
+                        <td>{payment.cardNumber}</td>
+                        <td>{payment.cvv}</td>
+                        <td>{payment.expiryDate}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           )}
         </div>

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './LoginForm.css';
 import { FaUser, FaLock } from 'react-icons/fa';
-import { UserContext1 } from './UserContext1';
+import { UserContext } from './UserContext';
 
 const LoginForm = () => {
   const [username, setUsername] = useState('');
@@ -11,12 +11,12 @@ const LoginForm = () => {
   const [loginMessage, setLoginMessage] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
-  const { setUserName1 } = useContext(UserContext1);
+  const { setUserName1 } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const loginData = { username, password, role: 'ROLE_USER' };
+    const loginData = { username, password, role : 'ROLE_USER' };
 
     try {
       const response = await axios.post('http://localhost:8080/auth/login', loginData);
@@ -31,15 +31,15 @@ const LoginForm = () => {
       setTimeout(() => {
         setShowPopup(false);
         navigate('/dashboard');
-      }, 1000);
+      }, 1000); // 2 seconds before navigating to the dashboard
       
     } catch (error) {
-      setLoginMessage('Invalid username or password');
+      setLoginMessage('Invalid username or password'); // Error message
       setShowPopup(true);
 
       setTimeout(() => {
         setShowPopup(false);
-      }, 2000);
+      }, 2000); // 2 seconds before hiding the message
     }
   };
 

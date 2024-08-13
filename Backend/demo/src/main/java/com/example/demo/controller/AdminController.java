@@ -16,42 +16,41 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.Orders;
+import com.example.demo.entity.PaymentInfo;
 import com.example.demo.entity.UserInfo;
 import com.example.demo.service.AdminService;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/admin")
-public class AdminController {
-
+public class AdminController 
+{
     @Autowired
     AdminService service;
-
     @PostMapping("/post/admin")
-    public ResponseEntity<String> addAdmin(@RequestBody UserInfo obj) {
+    public String addadmin(@RequestBody UserInfo obj)
+    {
         obj.setRoles("ROLE_ADMIN");
-        service.addAdmin(obj);
-        return ResponseEntity.ok("Admin added successfully");
+        service.addadmin(obj);
+        return "admin added successfully";
     }
-
     @PostMapping("/post/user")
-    public ResponseEntity<String> addUser(@RequestBody UserInfo obj) {
-        service.addUser(obj);
-        return ResponseEntity.ok("User added successfully");
+    public String adduser(@RequestBody UserInfo obj)
+    {
+        service.adduser(obj);
+        return "admin added successfully";
     }
-
     @PutMapping("/changestatus/{id}")
-    public ResponseEntity<String> changeStatus(@PathVariable int id) {
-        service.changeStatus(id);
-        return ResponseEntity.ok("Order approved");
+    public String changestatus(@PathVariable int id)
+    {
+        service.changestatus(id);
+        return "order approved";
     }
-
     @DeleteMapping("/deleteuser/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable int id) {
-        service.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    public void deleteuser(@PathVariable int id)
+    {
+        service.deleteuser(id);
     }
-
     @PutMapping("/edituser/{id}")
     public ResponseEntity<String> editUser(@PathVariable int id, @RequestBody UserInfo updatedUser) {
         boolean success = service.updateUser(id, updatedUser);
@@ -61,14 +60,19 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
-
     @GetMapping("/get/orders")
-    public List<Orders> getOrders() {
-        return service.getOrders();
+    public List<Orders> getorders()
+    {
+        return service.getorders();
     }
-
-    @GetMapping("/get/users")
-    public List<UserInfo> getUsers() {
-        return service.getUsers();
+    @GetMapping("get/users")
+    public List<UserInfo> getusers()
+    {
+        return service.getusers();
+    }
+    @GetMapping("/get")
+    public List<PaymentInfo> info()
+    {
+        return service.info();
     }
 }
